@@ -54,7 +54,9 @@ class QueryResult:
 # --------------------------------------------------------------------------- #
 # Synthetic data generation
 # --------------------------------------------------------------------------- #
-def _random_dates(rng: np.random.Generator, n: int, start: dt.date, span_days: int) -> list[dt.date]:
+def _random_dates(
+    rng: np.random.Generator, n: int, start: dt.date, span_days: int
+) -> list[dt.date]:
     offsets = rng.integers(0, span_days, size=n)
     return [start + dt.timedelta(days=int(o)) for o in offsets]
 
@@ -81,7 +83,9 @@ def _generate_frames(seed: int = SEED) -> dict[str, pd.DataFrame]:
             "customer_id": customer_id,
             "name": [f"Customer_{i:04d}" for i in customer_id],
             "email": [f"user{i:04d}@example.com" for i in customer_id],
-            "country": rng.choice(countries, n_customers, p=[0.4, 0.1, 0.12, 0.08, 0.06, 0.1, 0.05, 0.04, 0.03, 0.02]),
+            "country": rng.choice(
+                countries, n_customers, p=[0.4, 0.1, 0.12, 0.08, 0.06, 0.1, 0.05, 0.04, 0.03, 0.02]
+            ),
             "signup_date": _random_dates(rng, n_customers, dt.date(2022, 1, 1), 900),
             "segment": rng.choice(segments, n_customers, p=[0.6, 0.3, 0.1]),
         }
@@ -92,7 +96,9 @@ def _generate_frames(seed: int = SEED) -> dict[str, pd.DataFrame]:
         {
             "product_id": product_id,
             "name": [f"Product_{i:03d}" for i in product_id],
-            "category": rng.choice(categories, n_products, p=[0.25, 0.18, 0.15, 0.12, 0.1, 0.1, 0.1]),
+            "category": rng.choice(
+                categories, n_products, p=[0.25, 0.18, 0.15, 0.12, 0.1, 0.1, 0.1]
+            ),
             "price": np.round(rng.uniform(5, 500, n_products), 2),
             "cost": np.round(rng.uniform(2, 300, n_products), 2),
             "brand": rng.choice(brands, n_products),
@@ -118,7 +124,9 @@ def _generate_frames(seed: int = SEED) -> dict[str, pd.DataFrame]:
     item_product = rng.integers(1, n_products + 1, total_items)
     price_lookup = products.set_index("product_id")["price"]
     unit_price = price_lookup.reindex(item_product).to_numpy()
-    discount = np.round(rng.choice([0.0, 0.05, 0.1, 0.15, 0.2], total_items, p=[0.5, 0.15, 0.15, 0.1, 0.1]), 2)
+    discount = np.round(
+        rng.choice([0.0, 0.05, 0.1, 0.15, 0.2], total_items, p=[0.5, 0.15, 0.15, 0.1, 0.1]), 2
+    )
     quantity = rng.integers(1, 6, total_items)
     order_items = pd.DataFrame(
         {
@@ -205,9 +213,7 @@ def build_warehouse(path: str = "data/warehouse.duckdb", seed: int = SEED) -> st
         con.register("df_events", frames["events"])
         con.register("df_subscriptions", frames["subscriptions"])
 
-        con.execute(
-            "CREATE TABLE customers AS SELECT * FROM df_customers"
-        )
+        con.execute("CREATE TABLE customers AS SELECT * FROM df_customers")
         con.execute("ALTER TABLE customers ADD PRIMARY KEY (customer_id)")
         con.execute("CREATE TABLE products AS SELECT * FROM df_products")
         con.execute("ALTER TABLE products ADD PRIMARY KEY (product_id)")

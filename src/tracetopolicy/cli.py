@@ -28,12 +28,16 @@ def cmd_warehouse(args: argparse.Namespace) -> int:
 def cmd_info(args: argparse.Namespace) -> int:
     from .model_config import hardware_summary, resolve_model_config
 
-    print(json.dumps({"config": resolve_model_config().to_dict(), "hardware": hardware_summary()}, indent=2))
+    print(
+        json.dumps(
+            {"config": resolve_model_config().to_dict(), "hardware": hardware_summary()}, indent=2
+        )
+    )
     return 0
 
 
 def cmd_harvest(args: argparse.Namespace) -> int:
-    from .agent import NL2SQLAgent, summarize_traces
+    from .agent import NL2SQLAgent
     from .inference import get_generator_with_fallback
     from .model_config import hardware_summary, resolve_model_config
     from .splits import get_splits, load_tasks
@@ -88,9 +92,7 @@ def cmd_harvest(args: argparse.Namespace) -> int:
     summary["out"] = args.out
     print(json.dumps(summary, indent=2))
     print("\nfailure-mode histogram:")
-    for mode, count in sorted(
-        summary["failure_mode_histogram"].items(), key=lambda kv: -kv[1]
-    ):
+    for mode, count in sorted(summary["failure_mode_histogram"].items(), key=lambda kv: -kv[1]):
         print(f"  {mode:16s} {count}")
     print("\nNote:", cfg.notes)
     return 0
@@ -157,10 +159,10 @@ def build_parser() -> argparse.ArgumentParser:
     h.add_argument("--resume", action="store_true", help="skip tasks already present in --out")
     h.set_defaults(func=cmd_harvest)
 
-    l = sub.add_parser("label", help="build SFT/DPO datasets from traces")
-    l.add_argument("--traces", default="data/traces_train.jsonl")
-    l.add_argument("--outdir", default="data/datasets")
-    l.set_defaults(func=cmd_label)
+    lb = sub.add_parser("label", help="build SFT/DPO datasets from traces")
+    lb.add_argument("--traces", default="data/traces_train.jsonl")
+    lb.add_argument("--outdir", default="data/datasets")
+    lb.set_defaults(func=cmd_label)
 
     e = sub.add_parser("eval", help="run baseline vs SFT vs DPO evaluation")
     e.add_argument("--config", default="configs/eval.yaml")

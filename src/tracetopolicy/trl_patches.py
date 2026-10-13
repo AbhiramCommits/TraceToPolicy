@@ -61,7 +61,9 @@ class ChunkedLogProbFunction(torch.autograd.Function):
         for i in range(0, n, step):
             h = hidden[i : i + step]
             y = labels[i : i + step]
-            logits = _scale_logits(F.linear(h, weight, bias), temperature, logit_scale, final_logit_softcapping)
+            logits = _scale_logits(
+                F.linear(h, weight, bias), temperature, logit_scale, final_logit_softcapping
+            )
             logp = F.log_softmax(logits.float(), dim=-1)
             p = logp.exp()
             log_probs_list.append(logp.gather(1, y.unsqueeze(1)).squeeze(1))
@@ -74,7 +76,11 @@ class ChunkedLogProbFunction(torch.autograd.Function):
             if want_mean_logits:
                 mlog_list.append(logits.mean(dim=-1).detach())
 
-        log_probs = torch.cat(log_probs_list) if log_probs_list else hidden.new_zeros(0, dtype=torch.float32)
+        log_probs = (
+            torch.cat(log_probs_list)
+            if log_probs_list
+            else hidden.new_zeros(0, dtype=torch.float32)
+        )
         entropy = torch.cat(entropy_list) if entropy_list else None
         top1 = torch.cat(top1_list) if top1_list else None
         lssp = torch.cat(lssp_list) if lssp_list else None
@@ -104,7 +110,9 @@ class ChunkedLogProbFunction(torch.autograd.Function):
             h = hidden[i : i + ctx.step]
             y = labels[i : i + ctx.step]
             gi = g[i : i + ctx.step]
-            logits = _scale_logits(F.linear(h, weight, bias), ctx.temperature, ctx.logit_scale, ctx.softcap)
+            logits = _scale_logits(
+                F.linear(h, weight, bias), ctx.temperature, ctx.logit_scale, ctx.softcap
+            )
             logp = F.log_softmax(logits.float(), dim=-1)
             p = logp.exp()
             gl = -p * gi.unsqueeze(1)

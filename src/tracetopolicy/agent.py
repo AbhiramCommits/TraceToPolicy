@@ -230,7 +230,9 @@ class NL2SQLAgent:
         if status == "timeout":
             return "The query timed out. Rewrite it to be more efficient."
         if status == "error":
-            return f"The query failed with this DuckDB error:\n{error}\nFix it and return a new query."
+            return (
+                f"The query failed with this DuckDB error:\n{error}\nFix it and return a new query."
+            )
         if rows == 0:
             return "The query ran but returned no rows. Reconsider joins, filters and date ranges."
         return (
@@ -285,11 +287,7 @@ class NL2SQLAgent:
                 allowed, reason = check_select_only(sql) if sql else (False, "no SQL produced")
                 if sql and allowed:
                     result = run_sql(self.conn, sql, timeout_s=self.timeout_s)
-                    status = (
-                        "timeout"
-                        if result.timed_out
-                        else ("ok" if result.ok else "error")
-                    )
+                    status = "timeout" if result.timed_out else ("ok" if result.ok else "error")
                     correct = result.ok and results_equal(result, st["gold"])
                     failure_mode = classify_failure(
                         sql, result, task["gold_sql"], guardrail_blocked=False
@@ -364,7 +362,9 @@ class NL2SQLAgent:
         is skipped and new records are appended, so a long harvest never loses
         completed work.
         """
-        gold_lookup = {t["task_id"]: run_sql(self.conn, t["gold_sql"], self.timeout_s) for t in tasks}
+        gold_lookup = {
+            t["task_id"]: run_sql(self.conn, t["gold_sql"], self.timeout_s) for t in tasks
+        }
         os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
         mode = "w"
         all_records: list[dict] = []
@@ -376,7 +376,10 @@ class NL2SQLAgent:
             tasks = [t for t in tasks if t["task_id"] not in done_ids]
             mode = "a"
             if progress:
-                print(f"[harvest] resuming: {len(done_ids)} tasks / {len(all_records)} records already done", flush=True)
+                print(
+                    f"[harvest] resuming: {len(done_ids)} tasks / {len(all_records)} records already done",
+                    flush=True,
+                )
         with open(out_path, mode) as fh:
             for start in range(0, len(tasks), chunk_tasks):
                 chunk = tasks[start : start + chunk_tasks]

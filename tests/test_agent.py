@@ -1,13 +1,15 @@
 import duckdb
+from tests.fakes import ScriptedGenerator
 
 from tracetopolicy.agent import NL2SQLAgent
 from tracetopolicy.warehouse import run_sql
-from tests.fakes import ScriptedGenerator
 
 
 def _conn():
     con = duckdb.connect()
-    con.execute("CREATE TABLE customers AS SELECT * FROM (VALUES (1,'a','US'),(2,'b','CA')) t(customer_id,name,country)")
+    con.execute(
+        "CREATE TABLE customers AS SELECT * FROM (VALUES (1,'a','US'),(2,'b','CA')) t(customer_id,name,country)"
+    )
     return con
 
 
@@ -61,8 +63,15 @@ def test_agent_harvest_writes_jsonl(tmp_path):
     gen = ScriptedGenerator(["SELECT name FROM customers"])
     agent = NL2SQLAgent(gen, con, max_turns=3)
     out = tmp_path / "traces.jsonl"
-    summary = agent.harvest([TASK], split="train", out_path=str(out), samples_per_task=2,
-                            temperature=0.0, seed=0, progress=False)
+    summary = agent.harvest(
+        [TASK],
+        split="train",
+        out_path=str(out),
+        samples_per_task=2,
+        temperature=0.0,
+        seed=0,
+        progress=False,
+    )
     assert out.exists()
     assert summary["records"] == 2
     assert summary["task_solve_rate"] == 1.0

@@ -25,7 +25,9 @@ def rec(task, turn, sql, correct, mode="wrong_filter"):
 
 
 def test_normalize_sql_collapses_whitespace_and_case():
-    assert normalize_sql("SELECT  Name\nFROM customers") == normalize_sql("select name from customers")
+    assert normalize_sql("SELECT  Name\nFROM customers") == normalize_sql(
+        "select name from customers"
+    )
 
 
 def test_sft_uses_final_sql_conditioned_on_original_prompt():

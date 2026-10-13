@@ -49,18 +49,24 @@ def task_harvest() -> dict:
     reg = load_registry()
     adapter = _get_version(reg, reg["current"]).get("adapter")
     gen, _ = get_generator_with_fallback(
-        mcfg.base_model, fallbacks=mcfg.fallbacks, device=mcfg.device,
-        adapter_path=adapter, load_in_4bit=mcfg.load_in_4bit,
-        max_seq_length=mcfg.max_seq_length, name=f"live:{reg['current']}",
+        mcfg.base_model,
+        fallbacks=mcfg.fallbacks,
+        device=mcfg.device,
+        adapter_path=adapter,
+        load_in_4bit=mcfg.load_in_4bit,
+        max_seq_length=mcfg.max_seq_length,
+        name=f"live:{reg['current']}",
     )
     gen.max_new_tokens = mcfg.max_new_tokens
     train_ids = set(get_splits()["train"])
     tasks = [t for t in load_tasks() if t["task_id"] in train_ids][:LIVE_TASKS]
     con = connect(os.environ.get("TRACETOPOLICY_WAREHOUSE", "data/warehouse.duckdb"))
-    agent = NL2SQLAgent(gen, con, max_turns=3, model_name=reg["current"],
-                        max_new_tokens=mcfg.max_new_tokens)
-    return agent.harvest(tasks, split="train", out_path=HARVEST_OUT, samples_per_task=6,
-                         temperature=0.8, seed=1)
+    agent = NL2SQLAgent(
+        gen, con, max_turns=3, model_name=reg["current"], max_new_tokens=mcfg.max_new_tokens
+    )
+    return agent.harvest(
+        tasks, split="train", out_path=HARVEST_OUT, samples_per_task=6, temperature=0.8, seed=1
+    )
 
 
 def task_label() -> dict:
@@ -95,11 +101,18 @@ def task_gate() -> dict:
     con = connect(os.environ.get("TRACETOPOLICY_WAREHOUSE", "data/warehouse.duckdb"))
 
     def _eval(adapter):
-        gen = get_generator(mcfg.base_model, device=mcfg.device, adapter_path=adapter,
-                            load_in_4bit=mcfg.load_in_4bit, max_seq_length=mcfg.max_seq_length,
-                            name=adapter or "baseline")
+        gen = get_generator(
+            mcfg.base_model,
+            device=mcfg.device,
+            adapter_path=adapter,
+            load_in_4bit=mcfg.load_in_4bit,
+            max_seq_length=mcfg.max_seq_length,
+            name=adapter or "baseline",
+        )
         gen.max_new_tokens = mcfg.max_new_tokens
-        per_task = run_variant(gen, con, tasks, "regression", 1234, 3, 10.0, 16, adapter or "baseline")
+        per_task = run_variant(
+            gen, con, tasks, "regression", 1234, 3, 10.0, 16, adapter or "baseline"
+        )
         return aggregate(per_task)
 
     prev = _eval(incumbent)
@@ -151,7 +164,9 @@ def main() -> int:
     label = task_label()
     print("label:", json.dumps(label, indent=2))
     train = task_train()
-    print("train:", json.dumps({k: v.get("wall_clock_minutes") for k, v in train.items()}, indent=2))
+    print(
+        "train:", json.dumps({k: v.get("wall_clock_minutes") for k, v in train.items()}, indent=2)
+    )
     decision = task_gate()
     print("gate:", json.dumps(decision, indent=2))
     print("action:", task_promote_or_rollback(decision["promote"]))

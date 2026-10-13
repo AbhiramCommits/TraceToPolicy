@@ -49,7 +49,9 @@ def _numeric_values(records, feature):
     if feature == "sql_length":
         return [len(r.get("generated_sql") or "") for r in records]
     if feature == "token_count":
-        return [int(r.get("prompt_tokens", 0)) + int(r.get("completion_tokens", 0)) for r in records]
+        return [
+            int(r.get("prompt_tokens", 0)) + int(r.get("completion_tokens", 0)) for r in records
+        ]
     return [0 for _ in records]
 
 
@@ -71,9 +73,16 @@ def _hist(values, edges):
     return counts.tolist()
 
 
-def compute_drift(reference: list[dict], current: list[dict], threshold: float = DEFAULT_THRESHOLD) -> dict:
+def compute_drift(
+    reference: list[dict], current: list[dict], threshold: float = DEFAULT_THRESHOLD
+) -> dict:
     """PSI/KL per feature plus an overall drift decision."""
-    result: dict = {"threshold": threshold, "n_reference": len(reference), "n_current": len(current), "features": {}}
+    result: dict = {
+        "threshold": threshold,
+        "n_reference": len(reference),
+        "n_current": len(current),
+        "features": {},
+    }
 
     for feat in CATEGORICAL_FEATURES:
         ref_vals = _categorical_counts(reference, feat)

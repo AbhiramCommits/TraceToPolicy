@@ -203,8 +203,7 @@ def hardware_summary() -> dict:
         info["torch"] = torch.__version__
         info["cuda_available"] = torch.cuda.is_available()
         info["mps_available"] = bool(
-            getattr(torch.backends, "mps", None) is not None
-            and torch.backends.mps.is_available()
+            getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available()
         )
         if torch.cuda.is_available():
             info["cuda_device"] = torch.cuda.get_device_name(0)
@@ -219,4 +218,8 @@ def hardware_summary() -> dict:
 if __name__ == "__main__":  # pragma: no cover
     import json
 
-    print(json.dumps({"config": resolve_model_config().to_dict(), "hardware": hardware_summary()}, indent=2))
+    print(
+        json.dumps(
+            {"config": resolve_model_config().to_dict(), "hardware": hardware_summary()}, indent=2
+        )
+    )

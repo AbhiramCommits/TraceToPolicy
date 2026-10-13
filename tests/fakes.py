@@ -26,7 +26,7 @@ class ScriptedGenerator(Generator):
 
     def generate(self, prompts, max_new_tokens=96, temperature=0.0, top_p=1.0, seed=None):
         out = []
-        for i, prompt in enumerate(prompts):
+        for prompt in prompts:
             if callable(self.responses):
                 text = self.responses(prompt, self.calls)
             else:

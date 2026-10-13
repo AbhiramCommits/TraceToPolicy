@@ -19,6 +19,7 @@ htmlcov/
 # Warehouse + large local data
 data/*.duckdb
 data/*.duckdb.wal
+data/loop/
 
 # Run outputs (NOT results/, which is tracked)
 artifacts/

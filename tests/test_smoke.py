@@ -2,12 +2,13 @@
 
 
 def test_end_to_end_smoke(tmp_path, monkeypatch):
+    from tests.fakes import gold_generator
+
     from tracetopolicy import eval as ev
     from tracetopolicy import warehouse as wh
     from tracetopolicy.agent import NL2SQLAgent
     from tracetopolicy.labeling import label_all
     from tracetopolicy.splits import get_splits, load_tasks
-    from tests.fakes import gold_generator
 
     path = str(tmp_path / "wh.duckdb")
     wh.build_warehouse(path)
@@ -19,11 +20,14 @@ def test_end_to_end_smoke(tmp_path, monkeypatch):
     gen = gold_generator(tasks)
     agent = NL2SQLAgent(gen, con, max_turns=2)
     traces = tmp_path / "traces.jsonl"
-    summary = agent.harvest(tasks, "train", str(traces), samples_per_task=1,
-                            temperature=0.0, seed=0, progress=False)
+    summary = agent.harvest(
+        tasks, "train", str(traces), samples_per_task=1, temperature=0.0, seed=0, progress=False
+    )
     assert summary["task_solve_rate"] == 1.0
 
-    stats = label_all(str(traces), str(tmp_path / "datasets"), stats_path=str(tmp_path / "stats.json"))
+    stats = label_all(
+        str(traces), str(tmp_path / "datasets"), stats_path=str(tmp_path / "stats.json")
+    )
     assert stats["sft_examples"] == len(tasks)
 
     monkeypatch.setenv("TRACETOPOLICY_WAREHOUSE", path)

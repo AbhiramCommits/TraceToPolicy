@@ -9,7 +9,6 @@ the labeling stage.
 from __future__ import annotations
 
 import json
-import os
 import random
 
 DEFAULT_TASKS = "data/tasks.jsonl"
@@ -22,7 +21,9 @@ def load_tasks(path: str = DEFAULT_TASKS) -> list[dict]:
         return [json.loads(line) for line in fh if line.strip()]
 
 
-def split_ids(task_ids: list[str], seed: int = SEED, ratios: tuple = RATIOS) -> dict[str, list[str]]:
+def split_ids(
+    task_ids: list[str], seed: int = SEED, ratios: tuple = RATIOS
+) -> dict[str, list[str]]:
     ids = sorted(task_ids)
     rng = random.Random(seed)
     rng.shuffle(ids)

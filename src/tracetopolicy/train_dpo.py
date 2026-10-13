@@ -162,9 +162,15 @@ def main(config_path: str = "configs/dpo.yaml") -> dict:
         "target_modules": list(mcfg.lora_target_modules),
     }
     # capture reward margins from the log history
-    chosen_scores = [h.get("rewards/chosen") for h in trainer.state.log_history if "rewards/chosen" in h]
-    rejected_scores = [h.get("rewards/rejected") for h in trainer.state.log_history if "rewards/rejected" in h]
-    margins = [h.get("rewards/margins") for h in trainer.state.log_history if "rewards/margins" in h]
+    chosen_scores = [
+        h.get("rewards/chosen") for h in trainer.state.log_history if "rewards/chosen" in h
+    ]
+    rejected_scores = [
+        h.get("rewards/rejected") for h in trainer.state.log_history if "rewards/rejected" in h
+    ]
+    margins = [
+        h.get("rewards/margins") for h in trainer.state.log_history if "rewards/margins" in h
+    ]
 
     card = save_model_card(
         out_dir,
@@ -182,8 +188,12 @@ def main(config_path: str = "configs/dpo.yaml") -> dict:
             "num_examples": len(ds),
             "learning_rate": lr,
             "final_reward_margin": margins[-1] if margins else None,
-            "mean_chosen_reward": (sum(chosen_scores) / len(chosen_scores)) if chosen_scores else None,
-            "mean_rejected_reward": (sum(rejected_scores) / len(rejected_scores)) if rejected_scores else None,
+            "mean_chosen_reward": (
+                (sum(chosen_scores) / len(chosen_scores)) if chosen_scores else None
+            ),
+            "mean_rejected_reward": (
+                (sum(rejected_scores) / len(rejected_scores)) if rejected_scores else None
+            ),
             "training_loss": getattr(result, "training_loss", None),
         },
     )

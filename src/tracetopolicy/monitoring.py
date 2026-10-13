@@ -23,13 +23,28 @@ from prometheus_client import (
 REGISTRY = CollectorRegistry(auto_describe=True)
 
 WIN_RATE = Gauge("tracetopolicy_win_rate", "DPO/SFT win rate vs baseline", registry=REGISTRY)
-FINAL_ACCURACY = Gauge("tracetopolicy_final_accuracy", "final execution accuracy", ["variant"], registry=REGISTRY)
-TURN1_ACCURACY = Gauge("tracetopolicy_turn1_accuracy", "turn-1 execution accuracy", ["variant"], registry=REGISTRY)
-TOOL_CALL_ACCURACY = Gauge("tracetopolicy_tool_call_accuracy", "fraction of attempts passing the guardrail", ["variant"], registry=REGISTRY)
-TURNS_TO_SUCCESS = Gauge("tracetopolicy_turns_to_success", "mean turns to success", ["variant"], registry=REGISTRY)
-DRIFT_SCORE = Gauge("tracetopolicy_drift_score", "max PSI between train and live traces", registry=REGISTRY)
+FINAL_ACCURACY = Gauge(
+    "tracetopolicy_final_accuracy", "final execution accuracy", ["variant"], registry=REGISTRY
+)
+TURN1_ACCURACY = Gauge(
+    "tracetopolicy_turn1_accuracy", "turn-1 execution accuracy", ["variant"], registry=REGISTRY
+)
+TOOL_CALL_ACCURACY = Gauge(
+    "tracetopolicy_tool_call_accuracy",
+    "fraction of attempts passing the guardrail",
+    ["variant"],
+    registry=REGISTRY,
+)
+TURNS_TO_SUCCESS = Gauge(
+    "tracetopolicy_turns_to_success", "mean turns to success", ["variant"], registry=REGISTRY
+)
+DRIFT_SCORE = Gauge(
+    "tracetopolicy_drift_score", "max PSI between train and live traces", registry=REGISTRY
+)
 
-HARVEST_RECORDS = Counter("tracetopolicy_harvest_records_total", "trace records harvested", registry=REGISTRY)
+HARVEST_RECORDS = Counter(
+    "tracetopolicy_harvest_records_total", "trace records harvested", registry=REGISTRY
+)
 SFT_RUNS = Counter("tracetopolicy_sft_runs_total", "SFT runs", registry=REGISTRY)
 DPO_RUNS = Counter("tracetopolicy_dpo_runs_total", "DPO runs", registry=REGISTRY)
 PROMOTIONS = Counter("tracetopolicy_promotions_total", "model promotions", registry=REGISTRY)

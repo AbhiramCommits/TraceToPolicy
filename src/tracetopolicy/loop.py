@@ -32,14 +32,16 @@ DEFAULT_THRESHOLDS = {"cost_tolerance_pct": 25.0, "mode_regression_abs": 2}
 # --------------------------------------------------------------------------- #
 # Registry
 # --------------------------------------------------------------------------- #
-def load_registry(path: str = REGISTRY_PATH) -> dict:
+def load_registry(path: str | None = None) -> dict:
+    path = path or REGISTRY_PATH
     if os.path.exists(path):
         with open(path) as fh:
             return json.load(fh)
     return {"current": "v0", "versions": []}
 
 
-def save_registry(reg: dict, path: str = REGISTRY_PATH) -> None:
+def save_registry(reg: dict, path: str | None = None) -> None:
+    path = path or REGISTRY_PATH
     os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
     with open(path, "w") as fh:
         json.dump(reg, fh, indent=2)
@@ -91,8 +93,10 @@ def gate(prev_metrics: dict, new_metrics: dict, thresholds: dict) -> tuple[bool,
             f"{thresholds.get('cost_tolerance_pct', 25.0)}%)"
         )
 
-    promote = improves and not regressions and (
-        cost_rise_pct <= thresholds.get("cost_tolerance_pct", 25.0)
+    promote = (
+        improves
+        and not regressions
+        and (cost_rise_pct <= thresholds.get("cost_tolerance_pct", 25.0))
     )
     if promote:
         reasons = [
@@ -130,8 +134,15 @@ def _eval_adapter(base_model, adapter, con, tasks, cfg, seed):
     )
     gen.max_new_tokens = mcfg.max_new_tokens
     per_task = run_variant(
-        gen, con, tasks, "regression", seed, int(cfg.get("max_turns", 3)),
-        float(cfg.get("timeout_s", 10.0)), batch_size, adapter or "baseline",
+        gen,
+        con,
+        tasks,
+        "regression",
+        seed,
+        int(cfg.get("max_turns", 3)),
+        float(cfg.get("timeout_s", 10.0)),
+        batch_size,
+        adapter or "baseline",
     )
     del gen
     return {"metrics": aggregate(per_task), "per_task": per_task}
@@ -168,8 +179,7 @@ def _write_jsonl(path: str, rows: list[dict]) -> None:
 # --------------------------------------------------------------------------- #
 # One cycle
 # --------------------------------------------------------------------------- #
-def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
-              cfg: dict) -> dict:
+def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool, cfg: dict) -> dict:
     from .agent import NL2SQLAgent
     from .inference import get_generator_with_fallback
     from .warehouse import connect
@@ -197,21 +207,32 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
     )
     gen.max_new_tokens = mcfg.max_new_tokens
     agent = NL2SQLAgent(
-        gen, con, max_turns=int(cfg.get("max_turns", 3)),
+        gen,
+        con,
+        max_turns=int(cfg.get("max_turns", 3)),
         timeout_s=float(cfg.get("timeout_s", 10.0)),
-        model_name=current_version, max_new_tokens=mcfg.max_new_tokens,
+        model_name=current_version,
+        max_new_tokens=mcfg.max_new_tokens,
     )
     traces_path = os.path.join(cycle_dir, "live_traces.jsonl")
     harvest_summary = agent.harvest(
-        live_tasks, split="train", out_path=traces_path,
-        samples_per_task=int(cfg.get("live_samples", 6)), temperature=0.8,
-        seed=cycle_idx * 7 + 1, batch_size=int(cfg.get("batch_size", 16)),
+        live_tasks,
+        split="train",
+        out_path=traces_path,
+        samples_per_task=int(cfg.get("live_samples", 6)),
+        temperature=0.8,
+        seed=cycle_idx * 7 + 1,
+        batch_size=int(cfg.get("batch_size", 16)),
         progress=False,
     )
     del gen, agent
 
-    # 2. label
-    stats = label_all(traces_path, os.path.join(cycle_dir, "datasets"))
+    # 2. label (stats stay inside the cycle dir so the main dataset_stats.json is untouched)
+    stats = label_all(
+        traces_path,
+        os.path.join(cycle_dir, "datasets"),
+        stats_path=os.path.join(cycle_dir, "dataset_stats.json"),
+    )
     sft_path, dpo_path = stats["sft_path"], stats["dpo_path"]
     if degrade:
         sft_path, dpo_path = _degrade_datasets(sft_path, dpo_path, cycle_dir)
@@ -223,21 +244,28 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
     sft_out = os.path.join("artifacts", "loop", f"cycle{cycle_idx}", "sft")
     dpo_out = os.path.join("artifacts", "loop", f"cycle{cycle_idx}", "dpo")
     sft_cfg = {
-        "seed": 42 + cycle_idx, "dataset": sft_path, "output_dir": sft_out,
+        "seed": 42 + cycle_idx,
+        "dataset": sft_path,
+        "output_dir": sft_out,
         "max_steps": int(cfg.get("sft_steps", 50)),
         "learning_rate": float(cfg.get("sft_learning_rate", 5e-4)),
         "num_train_epochs": 8,
         "log_path": os.path.join("results", "loop", f"cycle{cycle_idx}_sft_log.json"),
-        "run_name": f"cycle{cycle_idx}_sft", "wandb_project": cfg.get("wandb_project", "tracetopolicy"),
+        "run_name": f"cycle{cycle_idx}_sft",
+        "wandb_project": cfg.get("wandb_project", "tracetopolicy"),
     }
     dpo_cfg = {
-        "seed": 42 + cycle_idx, "dataset": dpo_path, "output_dir": dpo_out,
-        "sft_adapter": sft_out, "max_steps": int(cfg.get("dpo_steps", 12)),
+        "seed": 42 + cycle_idx,
+        "dataset": dpo_path,
+        "output_dir": dpo_out,
+        "sft_adapter": sft_out,
+        "max_steps": int(cfg.get("dpo_steps", 12)),
         "learning_rate": float(cfg.get("dpo_learning_rate", 1e-5)),
         "beta": float(cfg.get("dpo_beta", 0.5)),
         "use_weighting": False,
         "log_path": os.path.join("results", "loop", f"cycle{cycle_idx}_dpo_log.json"),
-        "run_name": f"cycle{cycle_idx}_dpo", "wandb_project": cfg.get("wandb_project", "tracetopolicy"),
+        "run_name": f"cycle{cycle_idx}_dpo",
+        "wandb_project": cfg.get("wandb_project", "tracetopolicy"),
     }
     sft_yaml = os.path.join(cycle_dir, "sft.yaml")
     dpo_yaml = os.path.join(cycle_dir, "dpo.yaml")
@@ -254,8 +282,11 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
     promote, reasons, details = gate(prev_eval["metrics"], new_eval["metrics"], thresholds)
 
     # drift between seed (training) traces and this cycle's live traces
-    drift = compute_drift(load_traces(SEED_TRACES), load_traces(traces_path),
-                          threshold=cfg.get("drift_threshold", 0.2))
+    drift = compute_drift(
+        load_traces(SEED_TRACES),
+        load_traces(traces_path),
+        threshold=cfg.get("drift_threshold", 0.2),
+    )
     write_json("results/drift.json", drift)
 
     # 6. registry
@@ -285,7 +316,7 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
 
     # monitoring
     try:
-        from .monitoring import DRIFT_SCORE, PROMOTIONS, ROLLBACKS, SFT_RUNS, DPO_RUNS
+        from .monitoring import DPO_RUNS, DRIFT_SCORE, PROMOTIONS, ROLLBACKS, SFT_RUNS
 
         SFT_RUNS.inc()
         DPO_RUNS.inc()
@@ -295,7 +326,11 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
         pass
 
     entry["drift_detail"] = drift
-    print(json.dumps({k: entry[k] for k in ["version", "decision", "reasons", "gate_details"]}, indent=2))
+    print(
+        json.dumps(
+            {k: entry[k] for k in ["version", "decision", "reasons", "gate_details"]}, indent=2
+        )
+    )
     return entry
 
 
@@ -344,7 +379,11 @@ def run_cycles(cycles: int = 2, config_path: str | None = None) -> dict:
         entry = run_cycle(i, reg, live_tasks, degrade=degrade, cfg=cfg)
         history.append(entry)
 
-    out = {"cycles": history, "final_current": reg["current"], "registry": "artifacts/registry.json"}
+    out = {
+        "cycles": history,
+        "final_current": reg["current"],
+        "registry": "artifacts/registry.json",
+    }
     write_json("results/loop_history.json", out)
     return out
 

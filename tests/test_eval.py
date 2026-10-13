@@ -63,7 +63,11 @@ def _task(acc1, accf, turns=1, violations=0, attempts=1, tokens=100, latency=10)
 
 
 def test_aggregate_metrics():
-    per_task = [_task(True, True), _task(False, True, turns=2), _task(False, False, violations=1, attempts=2)]
+    per_task = [
+        _task(True, True),
+        _task(False, True, turns=2),
+        _task(False, False, violations=1, attempts=2),
+    ]
     agg = aggregate(per_task)
     assert agg["n_tasks"] == 3
     assert agg["accuracy_turn1"] == pytest.approx(1 / 3)

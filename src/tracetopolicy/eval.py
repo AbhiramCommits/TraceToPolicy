@@ -9,10 +9,7 @@ bootstrap 95% CIs on every accuracy metric and on the paired win-rate delta.
 
 from __future__ import annotations
 
-import json
-import math
 import os
-import random
 
 import numpy as np
 
@@ -86,17 +83,36 @@ def _per_task_metrics(records: list[dict], task_id: str) -> dict:
     }
 
 
-def run_variant(generator, conn, tasks: list[dict], split: str, seed: int,
-                max_turns: int, timeout_s: float, batch_size: int,
-                model_name: str) -> list[dict]:
+def run_variant(
+    generator,
+    conn,
+    tasks: list[dict],
+    split: str,
+    seed: int,
+    max_turns: int,
+    timeout_s: float,
+    batch_size: int,
+    model_name: str,
+) -> list[dict]:
     from .warehouse import run_sql
 
     gold_lookup = {t["task_id"]: run_sql(conn, t["gold_sql"], timeout_s) for t in tasks}
-    agent = NL2SQLAgent(generator, conn, max_turns=max_turns, timeout_s=timeout_s,
-                        model_name=model_name, max_new_tokens=generator_max_new_tokens(generator))
+    agent = NL2SQLAgent(
+        generator,
+        conn,
+        max_turns=max_turns,
+        timeout_s=timeout_s,
+        model_name=model_name,
+        max_new_tokens=generator_max_new_tokens(generator),
+    )
     records = agent.run_tasks(
-        tasks, gold_lookup, samples_per_task=1, temperature=0.0, seed=seed,
-        split=split, batch_size=batch_size,
+        tasks,
+        gold_lookup,
+        samples_per_task=1,
+        temperature=0.0,
+        seed=seed,
+        split=split,
+        batch_size=batch_size,
     )
     return [_per_task_metrics([r.to_json() for r in records], t["task_id"]) for t in tasks]
 
@@ -153,7 +169,9 @@ def evaluate_variant(per_task: list[dict], n_boot: int, seed: int, baseline=None
                 ties += 1
         out["win_tie_loss_vs_baseline"] = {"win": wins, "tie": ties, "loss": losses}
         out["win_rate_vs_baseline"] = wins / len(per_task) if per_task else 0.0
-        out["ci_accuracy_final_delta_vs_baseline"] = paired_bootstrap_ci(accf, base_accf, n=n_boot, seed=seed)
+        out["ci_accuracy_final_delta_vs_baseline"] = paired_bootstrap_ci(
+            accf, base_accf, n=n_boot, seed=seed
+        )
     return out
 
 
@@ -181,8 +199,13 @@ def _make_figures(report: dict, variant_order: list[str]) -> None:
     fig, ax = plt.subplots(figsize=(7, 4))
     x = np.arange(len(variant_order))
     width = 0.35
-    for i, (metric, label) in enumerate([("ci_accuracy_turn1", "turn-1"), ("ci_accuracy_final", "final")]):
-        means = [report[v]["metrics"].get(f"accuracy_{'turn1' if i == 0 else 'final'}") for v in variant_order]
+    for i, (metric, label) in enumerate(
+        [("ci_accuracy_turn1", "turn-1"), ("ci_accuracy_final", "final")]
+    ):
+        means = [
+            report[v]["metrics"].get(f"accuracy_{'turn1' if i == 0 else 'final'}")
+            for v in variant_order
+        ]
         lo = [report[v][metric]["lo"] for v in variant_order]
         hi = [report[v][metric]["hi"] for v in variant_order]
         lower = [max(0.0, m - lo_i) for m, lo_i in zip(means, lo, strict=True)]
@@ -219,8 +242,16 @@ def _make_figures(report: dict, variant_order: list[str]) -> None:
     # cost delta vs baseline
     base = variant_order[0]
     fig, ax = plt.subplots(figsize=(7, 4))
-    deltas_tok = [report[v]["metrics"]["mean_tokens_per_task"] - report[base]["metrics"]["mean_tokens_per_task"] for v in variant_order]
-    deltas_lat = [report[v]["metrics"]["mean_latency_ms_per_task"] - report[base]["metrics"]["mean_latency_ms_per_task"] for v in variant_order]
+    deltas_tok = [
+        report[v]["metrics"]["mean_tokens_per_task"]
+        - report[base]["metrics"]["mean_tokens_per_task"]
+        for v in variant_order
+    ]
+    deltas_lat = [
+        report[v]["metrics"]["mean_latency_ms_per_task"]
+        - report[base]["metrics"]["mean_latency_ms_per_task"]
+        for v in variant_order
+    ]
     x = np.arange(len(variant_order))
     ax.bar(x - 0.2, deltas_tok, 0.4, label="tokens/task")
     ax.bar(x + 0.2, deltas_lat, 0.4, label="latency ms/task")
@@ -235,8 +266,10 @@ def _make_figures(report: dict, variant_order: list[str]) -> None:
 
 
 def _markdown_table(report: dict, order: list[str]) -> str:
-    lines = ["| variant | acc@1 | acc@1 95% CI | final acc | final 95% CI | turns-to-success | guardrail-viol rate | tok/task | ms/task | win/tie/loss vs baseline | win rate |",
-             "|---|---|---|---|---|---|---|---|---|---|---|"]
+    lines = [
+        "| variant | acc@1 | acc@1 95% CI | final acc | final 95% CI | turns-to-success | guardrail-viol rate | tok/task | ms/task | win/tie/loss vs baseline | win rate |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
     for v in order:
         m = report[v]["metrics"]
         c1 = report[v]["ci_accuracy_turn1"]
@@ -309,17 +342,26 @@ def run_evaluation(config_path: str = "configs/eval.yaml", dry_run: bool = False
 
             def generate(self, prompts, max_new_tokens=96, temperature=0.0, top_p=1.0, seed=None):
                 out = []
-                for i, p in enumerate(prompts):
+                for p in prompts:
                     task = next((t for t in tasks if t["question"] in p), tasks[0])
                     correct = (hash((task["task_id"], len(prompts))) % 2) == 0
                     sql = task["gold_sql"] if correct else "SELECT 1"
-                    out.append(Generation(text=sql, prompt_tokens=len(p.split()), completion_tokens=5, latency_ms=1.0))
+                    out.append(
+                        Generation(
+                            text=sql,
+                            prompt_tokens=len(p.split()),
+                            completion_tokens=5,
+                            latency_ms=1.0,
+                        )
+                    )
                 return out
 
         generator = ScriptedGenerator()
         per_variant = {}
         for v in variants:
-            per_variant[v] = run_variant(generator, con, tasks, split, seed, max_turns, timeout_s, batch_size, v)
+            per_variant[v] = run_variant(
+                generator, con, tasks, split, seed, max_turns, timeout_s, batch_size, v
+            )
         report["dry_run"] = True
     else:
         from .inference import get_generator
@@ -327,13 +369,19 @@ def run_evaluation(config_path: str = "configs/eval.yaml", dry_run: bool = False
         per_variant = {}
         for v in variants:
             gen = get_generator(
-                mcfg.base_model, device=mcfg.device, adapter_path=adapters[v],
-                load_in_4bit=mcfg.load_in_4bit, max_seq_length=mcfg.max_seq_length,
-                batch_size=batch_size, name=f"{v}:{mcfg.base_model}",
+                mcfg.base_model,
+                device=mcfg.device,
+                adapter_path=adapters[v],
+                load_in_4bit=mcfg.load_in_4bit,
+                max_seq_length=mcfg.max_seq_length,
+                batch_size=batch_size,
+                name=f"{v}:{mcfg.base_model}",
             )
             gen.max_new_tokens = mcfg.max_new_tokens
             print(f"[eval] running {v} ...", flush=True)
-            per_variant[v] = run_variant(gen, con, tasks, split, seed, max_turns, timeout_s, batch_size, v)
+            per_variant[v] = run_variant(
+                gen, con, tasks, split, seed, max_turns, timeout_s, batch_size, v
+            )
             del gen
 
     # per-variant results
@@ -348,7 +396,8 @@ def run_evaluation(config_path: str = "configs/eval.yaml", dry_run: bool = False
         if v == "baseline":
             continue
         mode_deltas[v] = {
-            m: report[v]["metrics"]["failure_modes"].get(m, 0) - report["baseline"]["metrics"]["failure_modes"].get(m, 0)
+            m: report[v]["metrics"]["failure_modes"].get(m, 0)
+            - report["baseline"]["metrics"]["failure_modes"].get(m, 0)
             for m in FAILURE_MODES
         }
     report["failure_mode_deltas"] = mode_deltas

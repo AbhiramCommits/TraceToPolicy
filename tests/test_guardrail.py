@@ -55,7 +55,9 @@ def test_extract_sql_takes_first_statement():
 
 def test_classify_failure_wrong_table():
     res = QueryResult(ok=False, error="Catalog Error: Table with name nope does not exist!")
-    assert classify_failure("SELECT * FROM nope", res, "SELECT * FROM orders", False) == "wrong_table"
+    assert (
+        classify_failure("SELECT * FROM nope", res, "SELECT * FROM orders", False) == "wrong_table"
+    )
 
 
 def test_classify_failure_guardrail_and_timeout():

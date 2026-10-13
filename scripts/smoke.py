@@ -16,6 +16,7 @@ from tracetopolicy import warehouse as wh  # noqa: E402
 from tracetopolicy.agent import NL2SQLAgent  # noqa: E402
 from tracetopolicy.labeling import label_all  # noqa: E402
 from tracetopolicy.splits import get_splits, load_tasks  # noqa: E402
+
 sys.path.insert(0, os.path.dirname(__file__))
 from tests.fakes import gold_generator  # noqa: E402
 
@@ -31,10 +32,14 @@ def main() -> int:
     gen = gold_generator(tasks)
     agent = NL2SQLAgent(gen, con, max_turns=2)
     traces = os.path.join(tmp, "traces.jsonl")
-    summary = agent.harvest(tasks, "train", traces, samples_per_task=1, temperature=0.0, seed=0, progress=False)
+    summary = agent.harvest(
+        tasks, "train", traces, samples_per_task=1, temperature=0.0, seed=0, progress=False
+    )
     print("harvest:", summary["records"], "solve_rate:", summary["task_solve_rate"])
 
-    stats = label_all(traces, os.path.join(tmp, "datasets"), stats_path=os.path.join(tmp, "stats.json"))
+    stats = label_all(
+        traces, os.path.join(tmp, "datasets"), stats_path=os.path.join(tmp, "stats.json")
+    )
     print("label: sft=", stats["sft_examples"], "dpo=", stats["dpo_pairs"])
 
     os.environ["TRACETOPOLICY_WAREHOUSE"] = wh_path

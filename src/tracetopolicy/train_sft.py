@@ -129,7 +129,12 @@ def main(config_path: str = "configs/sft.yaml") -> dict:
     trainer.save_model(out_dir)
     tokenizer.save_pretrained(out_dir)
 
-    lora_cfg = {"r": lora_r, "lora_alpha": lora_alpha, "lora_dropout": lora_dropout, "target_modules": list(mcfg.lora_target_modules)}
+    lora_cfg = {
+        "r": lora_r,
+        "lora_alpha": lora_alpha,
+        "lora_dropout": lora_dropout,
+        "target_modules": list(mcfg.lora_target_modules),
+    }
     card = save_model_card(
         out_dir,
         stage="sft",

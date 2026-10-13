@@ -4,7 +4,13 @@ from tracetopolicy.labeling import REWARD_WEIGHTS, score_trace
 
 
 def rec(**kw):
-    base = {"correct": False, "turn": 0, "failure_mode": "wrong_filter", "guardrail_blocked": False, "execution_status": "ok"}
+    base = {
+        "correct": False,
+        "turn": 0,
+        "failure_mode": "wrong_filter",
+        "guardrail_blocked": False,
+        "execution_status": "ok",
+    }
     base.update(kw)
     return base
 
@@ -37,5 +43,7 @@ def test_reward_empty_penalty():
 
 
 def test_reward_guardrail_plus_turn_penalty():
-    r = score_trace(rec(correct=False, turn=2, failure_mode="guardrail_block", guardrail_blocked=True))
+    r = score_trace(
+        rec(correct=False, turn=2, failure_mode="guardrail_block", guardrail_blocked=True)
+    )
     assert r == pytest.approx(-0.5 - 0.2)
