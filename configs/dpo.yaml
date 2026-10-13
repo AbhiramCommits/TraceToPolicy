@@ -6,11 +6,12 @@ dataset: data/datasets/dpo_train.jsonl
 output_dir: artifacts/dpo
 sft_adapter: artifacts/sft
 base_model: null
-beta: 0.1
+beta: 0.5
 loss_type: sigmoid
+use_weighting: false
 num_train_epochs: 4
-max_steps: null
-learning_rate: null
+max_steps: 12
+learning_rate: 1.0e-5
 per_device_train_batch_size: null
 gradient_accumulation_steps: null
 max_length: 512

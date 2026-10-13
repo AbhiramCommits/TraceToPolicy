@@ -120,6 +120,7 @@ def main(config_path: str = "configs/dpo.yaml") -> dict:
         gradient_accumulation_steps=grad_accum,
         beta=beta,
         loss_type=cfg.get("loss_type", "sigmoid"),
+        use_weighting=bool(cfg.get("use_weighting", False)),
         max_length=max_length,
         logging_steps=int(cfg.get("logging_steps", 5)),
         save_strategy=cfg.get("save_strategy", "no"),

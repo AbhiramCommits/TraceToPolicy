@@ -185,7 +185,9 @@ def _make_figures(report: dict, variant_order: list[str]) -> None:
         means = [report[v]["metrics"].get(f"accuracy_{'turn1' if i == 0 else 'final'}") for v in variant_order]
         lo = [report[v][metric]["lo"] for v in variant_order]
         hi = [report[v][metric]["hi"] for v in variant_order]
-        err = [[m - l for m, l in zip(means, lo, strict=True)], [h - m for h, m in zip(means, hi, strict=True)]]
+        lower = [max(0.0, m - lo_i) for m, lo_i in zip(means, lo, strict=True)]
+        upper = [max(0.0, hi_i - m) for m, hi_i in zip(means, hi, strict=True)]
+        err = [lower, upper]
         ax.bar(x + (i - 0.5) * width, means, width, yerr=err, capsize=4, label=label)
     ax.set_xticks(x)
     ax.set_xticklabels(variant_order)
