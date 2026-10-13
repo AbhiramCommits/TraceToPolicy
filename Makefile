@@ -2,7 +2,7 @@
 #
 # Usage:
 #   make setup       create .venv and install dependencies
-#   make warehouse   build the DuckDB warehouse (50k rows, deterministic)
+#   make warehouse   build the DuckDB warehouse (~54k rows, deterministic)
 #   make traces      harvest agent traces on the train split
 #   make label       build SFT/DPO datasets from traces
 #   make sft         LoRA SFT
@@ -14,49 +14,51 @@
 #   make all         everything, in order
 
 SHELL := /bin/bash
-PYTHON_PIN ?= python3.11
+# Make's shell has a minimal PATH; make sure Homebrew/Linuxbrew locations are visible.
+export PATH := /opt/homebrew/bin:/usr/local/bin:$(PATH)
+# Prefer 3.11, then 3.12, then whatever python3 is available.
+PYTHON_PIN ?= $(shell command -v python3.11 2>/dev/null || command -v python3.12 2>/dev/null || command -v python3)
 VENV := .venv
-
-# Prefer the project venv when it exists.
-ifeq ($(wildcard $(VENV)/bin/python),)
-PY := $(PYTHON_PIN)
-else
 PY := $(VENV)/bin/python
-endif
+SENTINEL := $(VENV)/.installed
 
 .PHONY: setup warehouse traces label sft dpo eval loop dashboard test all clean
 
-setup:
+# Create the venv once; re-run when the dependency files change.
+$(SENTINEL): requirements.txt pyproject.toml
 	$(PYTHON_PIN) -m venv $(VENV)
-	$(VENV)/bin/python -m pip install --upgrade pip
-	$(VENV)/bin/python -m pip install -r requirements.txt
-	$(VENV)/bin/python -m pip install -e . --no-deps
+	$(PY) -m pip install --upgrade pip
+	$(PY) -m pip install -r requirements.txt
+	$(PY) -m pip install -e . --no-deps
+	touch $(SENTINEL)
 
-warehouse:
+setup: $(SENTINEL)
+
+warehouse: | $(SENTINEL)
 	$(PY) -m tracetopolicy.cli warehouse
 
-traces:
+traces: | $(SENTINEL)
 	$(PY) -m tracetopolicy.cli harvest --split train --samples-per-task 12 --out data/traces_train.jsonl --batch-size 32
 
-label:
+label: | $(SENTINEL)
 	$(PY) -m tracetopolicy.cli label --traces data/traces_train.jsonl --outdir data/datasets
 
-sft:
+sft: | $(SENTINEL)
 	$(PY) -m tracetopolicy.train_sft --config configs/sft.yaml
 
-dpo:
+dpo: | $(SENTINEL)
 	$(PY) -m tracetopolicy.train_dpo --config configs/dpo.yaml
 
-eval:
+eval: | $(SENTINEL)
 	$(PY) -m tracetopolicy.cli eval --config configs/eval.yaml
 
-loop:
+loop: | $(SENTINEL)
 	$(PY) -m tracetopolicy.cli loop --cycles 2
 
-dashboard:
+dashboard: | $(SENTINEL)
 	$(PY) -m tracetopolicy.cli dashboard
 
-test:
+test: | $(SENTINEL)
 	$(PY) -m pytest -m "not slow" --cov=tracetopolicy --cov-report=term-missing
 
 all: setup warehouse traces label sft dpo eval loop dashboard test
