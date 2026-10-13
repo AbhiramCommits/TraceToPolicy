@@ -61,6 +61,11 @@ def main(config_path: str = "configs/dpo.yaml") -> dict:
     from transformers import AutoTokenizer
     from trl import DPOConfig, DPOTrainer
 
+    from .trl_patches import patch_trl_for_cpu
+
+    if patch_trl_for_cpu():
+        print("[dpo] installed pure-PyTorch fused LM-head (no Triton on this platform)")
+
     torch.manual_seed(seed)
 
     sft_adapter = cfg.get("sft_adapter", "artifacts/sft")
@@ -90,15 +95,18 @@ def main(config_path: str = "configs/dpo.yaml") -> dict:
     policy = PeftModel.from_pretrained(policy_base, sft_adapter, is_trainable=True)
     policy.config.use_cache = False
 
-    # reference: a second frozen copy of base + SFT adapter
+    # reference: a second frozen copy of the base model with the SFT adapter
+    # MERGED in, so it is a plain model (TRL patches a plain reference cleanly;
+    # a PeftModel reference is patched incorrectly).
     ref_model = None
     try:
         ref_base = _build_model(mcfg.base_model, mcfg, load_in_4bit)
-        ref_model = PeftModel.from_pretrained(ref_base, sft_adapter)
+        ref_peft = PeftModel.from_pretrained(ref_base, sft_adapter)
+        ref_model = ref_peft.merge_and_unload(safe_merge=True)
         for p in ref_model.parameters():
             p.requires_grad = False
         ref_model.eval()
-        print("[dpo] using frozen SFT model as reference")
+        print("[dpo] using frozen (merged) SFT model as reference")
     except Exception as exc:  # noqa: BLE001
         print(f"[dpo] could not build explicit SFT reference ({exc}); using adapter-disabled base")
         ref_model = None

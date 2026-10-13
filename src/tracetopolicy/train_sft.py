@@ -39,6 +39,11 @@ def main(config_path: str = "configs/sft.yaml") -> dict:
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from trl import SFTConfig, SFTTrainer
 
+    from .trl_patches import patch_trl_for_cpu
+
+    if patch_trl_for_cpu():
+        print("[sft] installed pure-PyTorch fused LM-head (no Triton on this platform)")
+
     torch.manual_seed(seed)
 
     lora_r = int(pick(cfg.get("lora_r"), mcfg.lora_r))
