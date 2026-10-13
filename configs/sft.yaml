@@ -1,0 +1,21 @@
+# Supervised fine-tuning config.
+# Any value set to null is filled in from the resolved hardware tier
+# (see src/tracetopolicy/model_config.py).
+seed: 42
+dataset: data/datasets/sft_train.jsonl
+output_dir: artifacts/sft
+base_model: null            # null -> resolved from hardware tier
+num_train_epochs: 4
+max_steps: null             # tier default
+learning_rate: null         # tier default
+per_device_train_batch_size: null
+gradient_accumulation_steps: null
+max_seq_length: 512
+lora_r: null
+lora_alpha: null
+lora_dropout: null
+load_in_4bit: null
+logging_steps: 5
+save_strategy: "no"
+wandb_project: tracetopolicy
+run_name: sft

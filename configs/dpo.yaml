@@ -1,0 +1,25 @@
+# Direct preference optimization config.
+# DPO starts from the SFT adapter and keeps the SFT model as the frozen
+# reference (see train_dpo.py). null -> hardware-tier default.
+seed: 42
+dataset: data/datasets/dpo_train.jsonl
+output_dir: artifacts/dpo
+sft_adapter: artifacts/sft
+base_model: null
+beta: 0.1
+loss_type: sigmoid
+num_train_epochs: 4
+max_steps: null
+learning_rate: null
+per_device_train_batch_size: null
+gradient_accumulation_steps: null
+max_length: 512
+lora_r: null
+lora_alpha: null
+lora_dropout: null
+load_in_4bit: null
+precompute_ref_log_probs: true
+logging_steps: 5
+save_strategy: "no"
+wandb_project: tracetopolicy
+run_name: dpo

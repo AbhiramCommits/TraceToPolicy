@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracetopolicy"
+version = "0.1.0"
+description = "Post-training and continuous-learning pipeline for an NL-to-SQL LLM agent using differential-execution rewards."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "TraceToPolicy" }]
+dependencies = [
+    "torch",
+    "transformers",
+    "trl",
+    "peft",
+    "datasets",
+    "accelerate",
+    "duckdb",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "prometheus_client",
+    "sqlglot",
+    "wandb",
+    "PyYAML",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "black",
+    "mypy",
+    "types-PyYAML",
+]
+
+[project.scripts]
+tracetopolicy = "tracetopolicy.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+markers = [
+    "slow: tests that require model weights, a GPU, or long-running training (deselect with '-m \"not slow\"')",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["tracetopolicy"]
+omit = [
+    "src/tracetopolicy/train_sft.py",
+    "src/tracetopolicy/train_dpo.py",
+    "src/tracetopolicy/inference.py",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"airflow/dags/*" = ["E402", "F401", "I001"]
+"tests/*" = ["B011"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = false
+check_untyped_defs = false
+follow_imports = "silent"
+exclude = ["airflow/"]

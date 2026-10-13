@@ -1,0 +1,12 @@
+# Held-out evaluation config.
+seed: 42
+split: test
+max_turns: 3
+timeout_s: 10.0
+batch_size: 16
+bootstrap_samples: 10000
+base_model: null            # null -> resolved from hardware tier
+sft_adapter: artifacts/sft
+dpo_adapter: artifacts/dpo
+traces_for_drift: data/traces_train.jsonl
+wandb_project: tracetopolicy

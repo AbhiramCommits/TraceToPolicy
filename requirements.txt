@@ -1,0 +1,28 @@
+# Core runtime dependencies for TraceToPolicy.
+# Pinned to the versions validated in this build (see results/model_card.json).
+torch==2.11.0
+transformers==5.19.0
+trl==1.15.0
+peft==0.21.2
+datasets==5.1.0
+accelerate==1.15.0
+duckdb==1.5.1
+numpy==2.1.3
+pandas==2.3.3
+matplotlib==3.10.0
+prometheus_client==0.21.1
+sqlglot==30.22.0
+wandb==0.30.0
+PyYAML==6.0.2
+
+# Dev / CI
+pytest==8.3.4
+pytest-cov==7.1.0
+ruff==0.15.7
+black==24.10.0
+mypy==1.14.1
+
+# Optional accelerators (install manually if the hardware supports them):
+#   vllm        # batched offline inference on CUDA
+#   bitsandbytes  # 4-bit QLoRA on CUDA
+#   apache-airflow  # to run airflow/dags/tracetopolicy_dag.py on a scheduler
