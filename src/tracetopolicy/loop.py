@@ -224,13 +224,18 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
     dpo_out = os.path.join("artifacts", "loop", f"cycle{cycle_idx}", "dpo")
     sft_cfg = {
         "seed": 42 + cycle_idx, "dataset": sft_path, "output_dir": sft_out,
-        "max_steps": int(cfg.get("sft_steps", 40)),
+        "max_steps": int(cfg.get("sft_steps", 50)),
+        "learning_rate": float(cfg.get("sft_learning_rate", 5e-4)),
+        "num_train_epochs": 8,
         "log_path": os.path.join("results", "loop", f"cycle{cycle_idx}_sft_log.json"),
         "run_name": f"cycle{cycle_idx}_sft", "wandb_project": cfg.get("wandb_project", "tracetopolicy"),
     }
     dpo_cfg = {
         "seed": 42 + cycle_idx, "dataset": dpo_path, "output_dir": dpo_out,
-        "sft_adapter": sft_out, "max_steps": int(cfg.get("dpo_steps", 25)),
+        "sft_adapter": sft_out, "max_steps": int(cfg.get("dpo_steps", 12)),
+        "learning_rate": float(cfg.get("dpo_learning_rate", 1e-5)),
+        "beta": float(cfg.get("dpo_beta", 0.5)),
+        "use_weighting": False,
         "log_path": os.path.join("results", "loop", f"cycle{cycle_idx}_dpo_log.json"),
         "run_name": f"cycle{cycle_idx}_dpo", "wandb_project": cfg.get("wandb_project", "tracetopolicy"),
     }
@@ -251,6 +256,7 @@ def run_cycle(cycle_idx: int, reg: dict, live_tasks: list[dict], degrade: bool,
     # drift between seed (training) traces and this cycle's live traces
     drift = compute_drift(load_traces(SEED_TRACES), load_traces(traces_path),
                           threshold=cfg.get("drift_threshold", 0.2))
+    write_json("results/drift.json", drift)
 
     # 6. registry
     version = f"v{len(reg['versions'])}"

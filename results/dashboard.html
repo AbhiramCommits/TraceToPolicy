@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>TraceToPolicy dashboard</title>
+<style>
+ body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; color:#111827; }
+ h1 { font-size: 22px; } h2 { font-size: 16px; margin-top: 28px; }
+ table { border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+ th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left; }
+ th { background:#f9fafb; }
+ .cards { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; }
+ .card { border:1px solid #e5e7eb; border-radius:10px; padding:12px 16px; min-width:170px; }
+ .card .v { font-size: 24px; font-weight:600; }
+ .muted { color:#6b7280; font-size:12px; }
+</style></head><body>
+<h1>TraceToPolicy &mdash; NL-to-SQL continuous learning</h1>
+<p class="muted">generated 2026-10-13 15:22:12 &middot; current promoted version: <b>v1</b>
+ &middot; adapter: artifacts/loop/cycle1/dpo</p>
+<div class="cards">
+  <div class="card"><div class="muted">DPO win rate vs baseline</div><div class="v">0.100</div></div>
+  <div class="card"><div class="muted">tool-call accuracy (DPO)</div><div class="v">0.843</div></div>
+  <div class="card"><div class="muted">turns-to-success (DPO)</div><div class="v">1.20</div></div>
+  <div class="card"><div class="muted">train/live drift (max PSI)</div><div class="v">8.314</div></div>
+</div>
+
+<h2>Held-out evaluation</h2>
+<table><tr><th>variant</th><th>acc@1</th><th>final acc</th><th>turns-to-success</th>
+<th>tool-call acc</th><th>tokens/task</th><th>ms/task</th></tr><tr><td>baseline</td><td>0.250</td><td>0.250 <div style="background:#e5e7eb;border-radius:6px;height:14px;width:220px;display:inline-block;vertical-align:middle"><div style="background:#3b82f6;width:25.0%;height:14px;border-radius:6px"></div></div></td><td>1.00</td><td>0.900</td><td>1030</td><td>4</td></tr><tr><td>sft</td><td>0.250</td><td>0.250 <div style="background:#e5e7eb;border-radius:6px;height:14px;width:220px;display:inline-block;vertical-align:middle"><div style="background:#3b82f6;width:25.0%;height:14px;border-radius:6px"></div></div></td><td>1.00</td><td>0.800</td><td>999</td><td>7</td></tr><tr><td>dpo</td><td>0.200</td><td>0.250 <div style="background:#e5e7eb;border-radius:6px;height:14px;width:220px;display:inline-block;vertical-align:middle"><div style="background:#3b82f6;width:25.0%;height:14px;border-radius:6px"></div></div></td><td>1.20</td><td>0.843</td><td>1012</td><td>4</td></tr></table>
+
+<h2>Model registry</h2>
+<table><tr><th>version</th><th>parent</th><th>decision</th><th>created</th><th>reason</th></tr><tr><td>v0</td><td>None</td><td>initial</td><td>2026-10-13T14:53:17</td><td>untrained base model</td></tr><tr><td>v1</td><td>v0</td><td>promote</td><td>2026-10-13T15:06:20</td><td>final accuracy improved 0.600 -> 0.900; no failure-mode regression above 2</td></tr><tr><td>v2</td><td>v1</td><td>rollback</td><td>2026-10-13T15:18:50</td><td>final accuracy did not improve (0.600 -> 0.000); failure-mode regressions exceed threshold: {'missing_join': 6, 'bad_aggregation': 7}</td></tr></table>
+
+<h2>Continuous-learning cycles</h2>
+<table><tr><th>version</th><th>decision</th><th>accuracy (inc&rarr;cand)</th><th>cost delta</th><th>drift PSI</th><th>reasons</th></tr><tr><td>v1</td><td>promote</td><td>0.600 &rarr; 0.900</td><td>-45.8%</td><td>8.281</td><td>final accuracy improved 0.600 -> 0.900; no failure-mode regression above 2; cost per task change -45.8%</td></tr><tr><td>v2</td><td>rollback</td><td>0.600 &rarr; 0.000</td><td>+35.3%</td><td>8.314</td><td>final accuracy did not improve (0.600 -> 0.000); failure-mode regressions exceed threshold: {'missing_join': 6, 'bad_aggregation': 7}; cost per task rose 35.3% (limit 25.0%)</td></tr></table>
+
+<h2>Datasets</h2>
+<p class="muted">traces=265 &middot; SFT examples=15
+ &middot; DPO pairs=36 &middot; repair-derived=1</p>
+</body></html>

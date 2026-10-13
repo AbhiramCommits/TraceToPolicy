@@ -1,0 +1,156 @@
+{
+  "stage": "sft",
+  "config": {
+    "dataset": "data/loop/cycle2/sft_train_degraded.jsonl",
+    "learning_rate": 0.0005,
+    "log_path": "results/loop/cycle2_sft_log.json",
+    "max_steps": 50,
+    "num_train_epochs": 8,
+    "output_dir": "artifacts/loop/cycle2/sft",
+    "run_name": "cycle2_sft",
+    "seed": 44,
+    "wandb_project": "tracetopolicy"
+  },
+  "model_card": {
+    "stage": "sft",
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "tier": "cpu_apple",
+    "device": "cpu",
+    "load_in_4bit": false,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "lora_target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "steps": 50,
+    "seed": 44,
+    "dataset": "data/loop/cycle2/sft_train_degraded.jsonl",
+    "dataset_hash": "458ce1fcf1b44f4c",
+    "wall_clock_minutes": 3.77,
+    "notes": "CPU / Apple Silicon: 0.5B with LoRA, reduced steps.",
+    "train_loss": 0.3473025520145893,
+    "num_examples": 15,
+    "learning_rate": 0.0005,
+    "batch_size": 2,
+    "grad_accum": 2,
+    "max_length": 768
+  },
+  "log_history": [
+    {
+      "loss": 2.392811965942383,
+      "grad_norm": 2.3554487228393555,
+      "learning_rate": 0.0004,
+      "entropy": 1.6692861080169679,
+      "mean_token_accuracy": 0.6016811430454254,
+      "num_tokens": 4753.0,
+      "epoch": 1.25,
+      "step": 5
+    },
+    {
+      "loss": 0.8164443016052246,
+      "grad_norm": 1.8140064477920532,
+      "learning_rate": 0.00045555555555555556,
+      "entropy": 1.1654485881328582,
+      "mean_token_accuracy": 0.8454936921596528,
+      "num_tokens": 9502.0,
+      "epoch": 2.5,
+      "step": 10
+    },
+    {
+      "loss": 0.10960526466369629,
+      "grad_norm": 0.7292503118515015,
+      "learning_rate": 0.0004,
+      "entropy": 0.2024945616722107,
+      "mean_token_accuracy": 0.9779975354671478,
+      "num_tokens": 14263.0,
+      "epoch": 3.75,
+      "step": 15
+    },
+    {
+      "loss": 0.052804422378540036,
+      "grad_norm": 0.42228826880455017,
+      "learning_rate": 0.0003444444444444445,
+      "entropy": 0.06815863475203514,
+      "mean_token_accuracy": 0.988559901714325,
+      "num_tokens": 18765.0,
+      "epoch": 5.0,
+      "step": 20
+    },
+    {
+      "loss": 0.026827633380889893,
+      "grad_norm": 0.22989168763160706,
+      "learning_rate": 0.0002888888888888889,
+      "entropy": 0.04088951740413904,
+      "mean_token_accuracy": 0.9919810175895691,
+      "num_tokens": 23524.0,
+      "epoch": 6.25,
+      "step": 25
+    },
+    {
+      "loss": 0.018862104415893553,
+      "grad_norm": 0.17648109793663025,
+      "learning_rate": 0.00023333333333333333,
+      "entropy": 0.029023096710443497,
+      "mean_token_accuracy": 0.9941832780838012,
+      "num_tokens": 28278.0,
+      "epoch": 7.5,
+      "step": 30
+    },
+    {
+      "loss": 0.015256646275520324,
+      "grad_norm": 0.26532432436943054,
+      "learning_rate": 0.00017777777777777779,
+      "entropy": 0.023049689643085004,
+      "mean_token_accuracy": 0.9937721133232117,
+      "num_tokens": 33027.0,
+      "epoch": 8.75,
+      "step": 35
+    },
+    {
+      "loss": 0.014796717464923859,
+      "grad_norm": 0.21627548336982727,
+      "learning_rate": 0.00012222222222222221,
+      "entropy": 0.018875769060105085,
+      "mean_token_accuracy": 0.9935764789581298,
+      "num_tokens": 37530.0,
+      "epoch": 10.0,
+      "step": 40
+    },
+    {
+      "loss": 0.013066732883453369,
+      "grad_norm": 0.1711777299642563,
+      "learning_rate": 6.666666666666667e-05,
+      "entropy": 0.017501958087086676,
+      "mean_token_accuracy": 0.9945776045322419,
+      "num_tokens": 42282.0,
+      "epoch": 11.25,
+      "step": 45
+    },
+    {
+      "loss": 0.012549731135368346,
+      "grad_norm": 0.14991667866706848,
+      "learning_rate": 1.1111111111111112e-05,
+      "entropy": 0.018159727938473223,
+      "mean_token_accuracy": 0.9949965059757233,
+      "num_tokens": 47047.0,
+      "epoch": 12.5,
+      "step": 50
+    },
+    {
+      "train_runtime": 225.7129,
+      "train_samples_per_second": 0.886,
+      "train_steps_per_second": 0.222,
+      "total_flos": 102839513950464.0,
+      "train_loss": 0.3473025520145893,
+      "epoch": 12.5,
+      "step": 50
+    }
+  ]
+}

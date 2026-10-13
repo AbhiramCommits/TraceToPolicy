@@ -1,0 +1,11 @@
+beta: 0.5
+dataset: data/loop/cycle2/dpo_train_degraded.jsonl
+learning_rate: 1.0e-05
+log_path: results/loop/cycle2_dpo_log.json
+max_steps: 12
+output_dir: artifacts/loop/cycle2/dpo
+run_name: cycle2_dpo
+seed: 44
+sft_adapter: artifacts/loop/cycle2/sft
+use_weighting: false
+wandb_project: tracetopolicy

@@ -1,0 +1,9 @@
+dataset: data/loop/cycle1/datasets/sft_train.jsonl
+learning_rate: 0.0005
+log_path: results/loop/cycle1_sft_log.json
+max_steps: 50
+num_train_epochs: 8
+output_dir: artifacts/loop/cycle1/sft
+run_name: cycle1_sft
+seed: 43
+wandb_project: tracetopolicy

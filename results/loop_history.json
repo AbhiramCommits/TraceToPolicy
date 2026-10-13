@@ -1,0 +1,599 @@
+{
+  "cycles": [
+    {
+      "version": "v1",
+      "parent": "v0",
+      "created": "2026-10-13T15:06:20",
+      "candidate_adapter": "artifacts/loop/cycle1/dpo",
+      "promoted_adapter": "artifacts/loop/cycle1/dpo",
+      "decision": "promote",
+      "reasons": [
+        "final accuracy improved 0.600 -> 0.900",
+        "no failure-mode regression above 2",
+        "cost per task change -45.8%"
+      ],
+      "gate_details": {
+        "prev_accuracy_final": 0.6,
+        "new_accuracy_final": 0.9,
+        "accuracy_delta": 0.30000000000000004,
+        "cost_rise_pct": -45.77398653936453,
+        "mode_regressions": {}
+      },
+      "metrics": {
+        "n_tasks": 20,
+        "accuracy_turn1": 0.9,
+        "accuracy_final": 0.9,
+        "turns_to_success": 1.0,
+        "num_solved": 18,
+        "guardrail_violation_rate": 0.0,
+        "tool_call_accuracy": 1.0,
+        "mean_tokens_per_task": 346.45,
+        "mean_latency_ms_per_task": 1.1852228897623718,
+        "cost_per_task": 346.45,
+        "failure_modes": {
+          "correct": 18,
+          "syntax_error": 0,
+          "wrong_table": 0,
+          "missing_join": 0,
+          "bad_aggregation": 0,
+          "wrong_filter": 2,
+          "empty_result": 0,
+          "timeout": 0,
+          "guardrail_block": 0
+        }
+      },
+      "incumbent_metrics": {
+        "n_tasks": 20,
+        "accuracy_turn1": 0.6,
+        "accuracy_final": 0.6,
+        "turns_to_success": 1.0,
+        "num_solved": 12,
+        "guardrail_violation_rate": 0.0,
+        "tool_call_accuracy": 1.0,
+        "mean_tokens_per_task": 638.9,
+        "mean_latency_ms_per_task": 1.8517645541578531,
+        "cost_per_task": 638.9,
+        "failure_modes": {
+          "correct": 12,
+          "syntax_error": 0,
+          "wrong_table": 0,
+          "missing_join": 0,
+          "bad_aggregation": 0,
+          "wrong_filter": 8,
+          "empty_result": 0,
+          "timeout": 0,
+          "guardrail_block": 0
+        }
+      },
+      "harvest": {
+        "records": 273,
+        "tasks": 20,
+        "task_solve_rate": 0.8,
+        "failure_mode_histogram": {
+          "correct": 47,
+          "syntax_error": 6,
+          "wrong_table": 13,
+          "missing_join": 0,
+          "bad_aggregation": 1,
+          "wrong_filter": 168,
+          "empty_result": 7,
+          "timeout": 0,
+          "guardrail_block": 31
+        }
+      },
+      "dataset_stats": {
+        "traces": 273,
+        "train_tasks_with_correct": 16,
+        "sft_examples": 16,
+        "repair_derived_examples": 3,
+        "dpo_pairs": 38,
+        "dpo_tasks": 13,
+        "max_pairs_per_task": 3,
+        "rejected_failure_modes": {
+          "wrong_filter": 22,
+          "guardrail_block": 8,
+          "wrong_table": 5,
+          "empty_result": 1,
+          "bad_aggregation": 1,
+          "syntax_error": 1
+        },
+        "leakage_check": "passed",
+        "split_sizes": {
+          "train": 97,
+          "dev": 21,
+          "test": 20
+        },
+        "sft_path": "data/loop/cycle1/datasets/sft_train.jsonl",
+        "dpo_path": "data/loop/cycle1/datasets/dpo_train.jsonl"
+      },
+      "degraded_cycle": false,
+      "drift": {
+        "max_psi": 8.281393141593284,
+        "drift_detected": true
+      },
+      "sft_card": {
+        "stage": "sft",
+        "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+        "tier": "cpu_apple",
+        "device": "cpu",
+        "load_in_4bit": false,
+        "lora_rank": 8,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "steps": 50,
+        "seed": 43,
+        "dataset": "data/loop/cycle1/datasets/sft_train.jsonl",
+        "dataset_hash": "0456ba4346356d8c",
+        "wall_clock_minutes": 4.51,
+        "notes": "CPU / Apple Silicon: 0.5B with LoRA, reduced steps.",
+        "train_loss": 0.3230669044703245,
+        "num_examples": 16,
+        "learning_rate": 0.0005,
+        "batch_size": 2,
+        "grad_accum": 2,
+        "max_length": 768
+      },
+      "dpo_card": {
+        "stage": "dpo",
+        "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+        "tier": "cpu_apple",
+        "device": "cpu",
+        "load_in_4bit": false,
+        "lora_rank": 8,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "steps": 12,
+        "seed": 43,
+        "dataset": "data/loop/cycle1/datasets/dpo_train.jsonl",
+        "dataset_hash": "2d253f61f4f8ec36",
+        "wall_clock_minutes": 1.66,
+        "notes": "CPU / Apple Silicon: 0.5B with LoRA, reduced steps.",
+        "parent_adapter": "artifacts/loop/cycle1/sft",
+        "beta": 0.5,
+        "loss_type": "sigmoid",
+        "num_examples": 38,
+        "learning_rate": 1e-05,
+        "final_reward_margin": 2.443468600511551,
+        "mean_chosen_reward": 0.002373560927635818,
+        "mean_rejected_reward": -1.5080228443498964,
+        "training_loss": 0.3522830680012703
+      },
+      "drift_detail": {
+        "threshold": 0.2,
+        "n_reference": 3181,
+        "n_current": 273,
+        "features": {
+          "category": {
+            "type": "categorical",
+            "psi": 8.281393141593284,
+            "kl": 7.1166675017986,
+            "drift": true,
+            "categories": [
+              "aggregate",
+              "ambiguous",
+              "date",
+              "filter",
+              "groupby_having",
+              "join",
+              "subquery",
+              "window"
+            ],
+            "reference_counts": [
+              211,
+              408,
+              484,
+              278,
+              477,
+              683,
+              318,
+              322
+            ],
+            "current_counts": [
+              38,
+              0,
+              0,
+              137,
+              0,
+              98,
+              0,
+              0
+            ]
+          },
+          "failure_mode": {
+            "type": "categorical",
+            "psi": 0.3368875946550616,
+            "kl": 0.21010413309936013,
+            "drift": true,
+            "categories": [
+              "bad_aggregation",
+              "correct",
+              "empty_result",
+              "guardrail_block",
+              "missing_join",
+              "syntax_error",
+              "wrong_filter",
+              "wrong_table"
+            ],
+            "reference_counts": [
+              14,
+              168,
+              86,
+              667,
+              44,
+              100,
+              1925,
+              177
+            ],
+            "current_counts": [
+              1,
+              47,
+              7,
+              31,
+              0,
+              6,
+              168,
+              13
+            ]
+          },
+          "sql_length": {
+            "type": "numeric",
+            "psi": 0.3198898290486324,
+            "kl": 0.15690610335461058,
+            "drift": true,
+            "edges": [
+              "-inf",
+              71.0,
+              107.0,
+              135.0,
+              162.0,
+              191.0,
+              219.0,
+              252.0,
+              293.0,
+              342.0,
+              "inf"
+            ]
+          },
+          "token_count": {
+            "type": "numeric",
+            "psi": 0.32200178588869655,
+            "kl": 0.15583821579026685,
+            "drift": true,
+            "edges": [
+              "-inf",
+              277.0,
+              296.0,
+              323.0000000000001,
+              372.0,
+              410.0,
+              446.0,
+              482.0,
+              522.0,
+              587.0,
+              "inf"
+            ]
+          }
+        },
+        "max_psi": 8.281393141593284,
+        "drift_detected": true
+      }
+    },
+    {
+      "version": "v2",
+      "parent": "v1",
+      "created": "2026-10-13T15:18:50",
+      "candidate_adapter": "artifacts/loop/cycle2/dpo",
+      "promoted_adapter": null,
+      "decision": "rollback",
+      "reasons": [
+        "final accuracy did not improve (0.600 -> 0.000)",
+        "failure-mode regressions exceed threshold: {'missing_join': 6, 'bad_aggregation': 7}",
+        "cost per task rose 35.3% (limit 25.0%)"
+      ],
+      "gate_details": {
+        "prev_accuracy_final": 0.6,
+        "new_accuracy_final": 0.0,
+        "accuracy_delta": -0.6,
+        "cost_rise_pct": 35.27938644545312,
+        "mode_regressions": {
+          "missing_join": 6,
+          "bad_aggregation": 7
+        }
+      },
+      "metrics": {
+        "n_tasks": 20,
+        "accuracy_turn1": 0.0,
+        "accuracy_final": 0.0,
+        "turns_to_success": 0.0,
+        "num_solved": 0,
+        "guardrail_violation_rate": 0.0,
+        "tool_call_accuracy": 1.0,
+        "mean_tokens_per_task": 864.3,
+        "mean_latency_ms_per_task": 0.4681999533204362,
+        "cost_per_task": 864.3,
+        "failure_modes": {
+          "correct": 0,
+          "syntax_error": 0,
+          "wrong_table": 0,
+          "missing_join": 6,
+          "bad_aggregation": 7,
+          "wrong_filter": 7,
+          "empty_result": 0,
+          "timeout": 0,
+          "guardrail_block": 0
+        }
+      },
+      "incumbent_metrics": {
+        "n_tasks": 20,
+        "accuracy_turn1": 0.6,
+        "accuracy_final": 0.6,
+        "turns_to_success": 1.0,
+        "num_solved": 12,
+        "guardrail_violation_rate": 0.0,
+        "tool_call_accuracy": 1.0,
+        "mean_tokens_per_task": 638.9,
+        "mean_latency_ms_per_task": 2.2304957325104624,
+        "cost_per_task": 638.9,
+        "failure_modes": {
+          "correct": 12,
+          "syntax_error": 0,
+          "wrong_table": 0,
+          "missing_join": 0,
+          "bad_aggregation": 0,
+          "wrong_filter": 8,
+          "empty_result": 0,
+          "timeout": 0,
+          "guardrail_block": 0
+        }
+      },
+      "harvest": {
+        "records": 265,
+        "tasks": 20,
+        "task_solve_rate": 0.75,
+        "failure_mode_histogram": {
+          "correct": 49,
+          "syntax_error": 1,
+          "wrong_table": 11,
+          "missing_join": 2,
+          "bad_aggregation": 0,
+          "wrong_filter": 168,
+          "empty_result": 1,
+          "timeout": 0,
+          "guardrail_block": 33
+        }
+      },
+      "dataset_stats": {
+        "traces": 265,
+        "train_tasks_with_correct": 15,
+        "sft_examples": 15,
+        "repair_derived_examples": 1,
+        "dpo_pairs": 36,
+        "dpo_tasks": 12,
+        "max_pairs_per_task": 3,
+        "rejected_failure_modes": {
+          "wrong_filter": 22,
+          "guardrail_block": 8,
+          "wrong_table": 5,
+          "empty_result": 1
+        },
+        "leakage_check": "passed",
+        "split_sizes": {
+          "train": 97,
+          "dev": 21,
+          "test": 20
+        },
+        "sft_path": "data/loop/cycle2/datasets/sft_train.jsonl",
+        "dpo_path": "data/loop/cycle2/datasets/dpo_train.jsonl"
+      },
+      "degraded_cycle": true,
+      "drift": {
+        "max_psi": 8.314183476405308,
+        "drift_detected": true
+      },
+      "sft_card": {
+        "stage": "sft",
+        "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+        "tier": "cpu_apple",
+        "device": "cpu",
+        "load_in_4bit": false,
+        "lora_rank": 8,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "steps": 50,
+        "seed": 44,
+        "dataset": "data/loop/cycle2/sft_train_degraded.jsonl",
+        "dataset_hash": "458ce1fcf1b44f4c",
+        "wall_clock_minutes": 3.77,
+        "notes": "CPU / Apple Silicon: 0.5B with LoRA, reduced steps.",
+        "train_loss": 0.3473025520145893,
+        "num_examples": 15,
+        "learning_rate": 0.0005,
+        "batch_size": 2,
+        "grad_accum": 2,
+        "max_length": 768
+      },
+      "dpo_card": {
+        "stage": "dpo",
+        "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+        "tier": "cpu_apple",
+        "device": "cpu",
+        "load_in_4bit": false,
+        "lora_rank": 8,
+        "lora_alpha": 16,
+        "lora_dropout": 0.05,
+        "lora_target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj",
+          "gate_proj",
+          "up_proj",
+          "down_proj"
+        ],
+        "steps": 12,
+        "seed": 44,
+        "dataset": "data/loop/cycle2/dpo_train_degraded.jsonl",
+        "dataset_hash": "5e6306685d3b9ee6",
+        "wall_clock_minutes": 1.85,
+        "notes": "CPU / Apple Silicon: 0.5B with LoRA, reduced steps.",
+        "parent_adapter": "artifacts/loop/cycle2/sft",
+        "beta": 0.5,
+        "loss_type": "sigmoid",
+        "num_examples": 36,
+        "learning_rate": 1e-05,
+        "final_reward_margin": 5.3333728313446045,
+        "mean_chosen_reward": 1.163632090886434,
+        "mean_rejected_reward": -1.3508411089579264,
+        "training_loss": 0.32200300724556047
+      },
+      "drift_detail": {
+        "threshold": 0.2,
+        "n_reference": 3181,
+        "n_current": 265,
+        "features": {
+          "category": {
+            "type": "categorical",
+            "psi": 8.314183476405308,
+            "kl": 7.125127210494779,
+            "drift": true,
+            "categories": [
+              "aggregate",
+              "ambiguous",
+              "date",
+              "filter",
+              "groupby_having",
+              "join",
+              "subquery",
+              "window"
+            ],
+            "reference_counts": [
+              211,
+              408,
+              484,
+              278,
+              477,
+              683,
+              318,
+              322
+            ],
+            "current_counts": [
+              37,
+              0,
+              0,
+              138,
+              0,
+              90,
+              0,
+              0
+            ]
+          },
+          "failure_mode": {
+            "type": "categorical",
+            "psi": 0.36054143199679295,
+            "kl": 0.19642422409250032,
+            "drift": true,
+            "categories": [
+              "bad_aggregation",
+              "correct",
+              "empty_result",
+              "guardrail_block",
+              "missing_join",
+              "syntax_error",
+              "wrong_filter",
+              "wrong_table"
+            ],
+            "reference_counts": [
+              14,
+              168,
+              86,
+              667,
+              44,
+              100,
+              1925,
+              177
+            ],
+            "current_counts": [
+              0,
+              49,
+              1,
+              33,
+              2,
+              1,
+              168,
+              11
+            ]
+          },
+          "sql_length": {
+            "type": "numeric",
+            "psi": 0.2413958275745741,
+            "kl": 0.11619299358208204,
+            "drift": true,
+            "edges": [
+              "-inf",
+              71.0,
+              107.0,
+              135.0,
+              162.0,
+              191.0,
+              219.0,
+              252.0,
+              293.0,
+              342.0,
+              "inf"
+            ]
+          },
+          "token_count": {
+            "type": "numeric",
+            "psi": 0.2692899263835728,
+            "kl": 0.13063965658424515,
+            "drift": true,
+            "edges": [
+              "-inf",
+              277.0,
+              296.0,
+              323.0000000000001,
+              372.0,
+              410.0,
+              446.0,
+              482.0,
+              522.0,
+              587.0,
+              "inf"
+            ]
+          }
+        },
+        "max_psi": 8.314183476405308,
+        "drift_detected": true
+      }
+    }
+  ],
+  "final_current": "v1",
+  "registry": "artifacts/registry.json"
+}
