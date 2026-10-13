@@ -1,0 +1,25 @@
+{
+  "traces": 3181,
+  "train_tasks_with_correct": 42,
+  "sft_examples": 42,
+  "repair_derived_examples": 5,
+  "dpo_pairs": 121,
+  "dpo_tasks": 41,
+  "max_pairs_per_task": 3,
+  "rejected_failure_modes": {
+    "wrong_filter": 48,
+    "guardrail_block": 39,
+    "wrong_table": 13,
+    "empty_result": 11,
+    "syntax_error": 9,
+    "missing_join": 1
+  },
+  "leakage_check": "passed",
+  "split_sizes": {
+    "train": 97,
+    "dev": 21,
+    "test": 20
+  },
+  "sft_path": "data/datasets/sft_train.jsonl",
+  "dpo_path": "data/datasets/dpo_train.jsonl"
+}
