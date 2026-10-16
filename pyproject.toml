@@ -46,6 +46,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+pythonpath = ["."]
 markers = [
     "slow: tests that require model weights, a GPU, or long-running training (deselect with '-m \"not slow\"')",
 ]
