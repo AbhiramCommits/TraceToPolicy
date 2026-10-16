@@ -3,7 +3,6 @@
 
 def test_end_to_end_smoke(tmp_path, monkeypatch):
     from tests.fakes import gold_generator
-
     from tracetopolicy import eval as ev
     from tracetopolicy import warehouse as wh
     from tracetopolicy.agent import NL2SQLAgent
