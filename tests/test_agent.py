@@ -1,6 +1,6 @@
 import duckdb
-from tests.fakes import ScriptedGenerator
 
+from tests.fakes import ScriptedGenerator
 from tracetopolicy.agent import NL2SQLAgent
 from tracetopolicy.warehouse import run_sql
 

@@ -6,7 +6,6 @@ rollback on the degraded cycle.
 """
 
 from tests.fakes import gold_generator
-
 from tracetopolicy import inference, loop, train_dpo, train_sft
 from tracetopolicy.splits import get_splits, load_tasks
 from tracetopolicy.warehouse import build_warehouse

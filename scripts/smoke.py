@@ -17,7 +17,8 @@ from tracetopolicy.agent import NL2SQLAgent  # noqa: E402
 from tracetopolicy.labeling import label_all  # noqa: E402
 from tracetopolicy.splits import get_splits, load_tasks  # noqa: E402
 
-sys.path.insert(0, os.path.dirname(__file__))
+# Repo root, so the shared test fakes in tests/fakes.py are importable.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from tests.fakes import gold_generator  # noqa: E402
 
 
